@@ -182,6 +182,10 @@ class Installer_model extends CI_Model {
 				'unsigned'       => TRUE,
 				'auto_increment' => TRUE,
 			),
+			'image_uri'         => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
 			'image_author'      => array(
 				'type'       => 'VARCHAR',
 				'constraint' => 255,
@@ -196,6 +200,7 @@ class Installer_model extends CI_Model {
 			),
 		);
 		$this->dbforge->add_key('image_id', TRUE);
+		$this->dbforge->add_key('image_uri');
 		$this->dbforge->add_field($fields);
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
