@@ -453,12 +453,12 @@ class Installer_model extends CI_Model {
 	/**
 	 * Tabela de Previsão do Tempo
 	 *
-	 * Deve ser gerenciada periodicamente sendo chamada pelo cron
+	 * @todo Deve ser gerenciada periodicamente sendo chamada pelo cron
 	 *
 	 * Dados coletados em http://forecast.io
 	 *
-	 * @see Installer_model::$table_weather
-	 * @see https://developer.forecast.io/docs/v2
+	 * @see  Installer_model::$table_weather
+	 * @see  https://developer.forecast.io/docs/v2
 	 * @return void
 	 */
 	protected function table_weather()
