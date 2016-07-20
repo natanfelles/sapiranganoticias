@@ -31,6 +31,12 @@ class Installer_model extends CI_Model {
 	protected $table_authors = 'authors';
 
 	/**
+	 * @see Installer_model::table_images()
+	 * @var string $table_news Nome da Tabela de Imagens
+	 */
+	protected $table_images = 'images';
+
+	/**
 	 * @see Installer_model::table_news()
 	 * @var string $table_news Nome da Tabela de Notícias
 	 */
@@ -59,6 +65,7 @@ class Installer_model extends CI_Model {
 	public function create_tables()
 	{
 		$this->table_authors();
+		$this->table_images();
 		$this->table_categories();
 		$this->table_subcategories();
 		$this->table_news();
@@ -115,6 +122,40 @@ class Installer_model extends CI_Model {
 		$this->dbforge->add_field($fields);
 		// Todo: Relacionar
 		//$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
+	}
+
+	/**
+	 * Tabela de Imagens
+	 * @see Installer_model::$table_images
+	 * @return void
+	 */
+	protected function table_images()
+	{
+		$table = $this->table_images;
+
+		$fields = array(
+			'image_id'          => array(
+				'type'           => 'INT',
+				'unsigned'       => TRUE,
+				'auto_increment' => TRUE,
+			),
+			'image_author'      => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'image_datetime'    => array(
+				'type'    => 'DATETIME',
+				'default' => '0000-00-00 00:00:00',
+			),
+			'image_description' => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+		);
+		$this->dbforge->add_key('image_id', TRUE);
+		$this->dbforge->add_field($fields);
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
@@ -247,7 +288,6 @@ class Installer_model extends CI_Model {
 			'image_id'               => array(
 				'type'     => 'INT',
 				'unsigned' => TRUE,
-				'comment'  => 'Todo: Relacionar',
 			),
 		);
 		$this->dbforge->add_key('subcategory_uri');
@@ -255,8 +295,7 @@ class Installer_model extends CI_Model {
 		$this->dbforge->add_field($fields);
 		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (subcategory_uri) REFERENCES {$this->table_subcategories}(subcategory_uri) ON DELETE CASCADE ON UPDATE CASCADE");
 		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (author_id) REFERENCES {$this->table_authors}(author_id) ON DELETE CASCADE ON UPDATE CASCADE");
-		// Todo: Relacionar
-		//$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (image_id) REFERENCES {$this->table_images}(image_id) ON DELETE CASCADE ON UPDATE CASCADE");
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (image_id) REFERENCES {$this->table_images}(image_id) ON DELETE CASCADE ON UPDATE CASCADE");
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
