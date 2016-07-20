@@ -1,3 +1,3 @@
 # Sapiranga Notícias
 
-Projeto desenvolvido para dar suporte a página no [Facebook](https://www.facebook.com/SapirangaNoticias/).
+Projeto desenvolvido para dar suporte à página no [Facebook](https://www.facebook.com/SapirangaNoticias/).
