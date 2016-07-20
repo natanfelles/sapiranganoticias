@@ -61,6 +61,12 @@ class Installer_model extends CI_Model {
 	protected $table_subcategories_to_news = 'subcategories_to_news';
 
 	/**
+	 * @see Installer_model::table_weather()
+	 * @var string $table_weather Nome da Tabela de Previsão do tempo
+	 */
+	protected $table_weather = 'weather';
+
+	/**
 	 * Installer_model constructor
 	 */
 	public function __construct()
@@ -72,6 +78,7 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Cria as tabelas necessárias no banco de dados
+	 *
 	 * @return void
 	 */
 	public function create_tables()
@@ -84,11 +91,14 @@ class Installer_model extends CI_Model {
 		$this->table_subcategories();
 		$this->table_news();
 		$this->table_subcategories_to_news();
+		$this->table_weather();
 	}
 
 	/**
 	 * Tabela de Usuários
+	 *
 	 * Usada para autenticação
+	 *
 	 * @see Installer_model::$table_user
 	 * @return void
 	 */
@@ -137,6 +147,7 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela para Recuperação de Senhas
+	 *
 	 * @see Installer_model::$recover_passwords
 	 * @return void
 	 */
@@ -168,6 +179,7 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela de Autores
+	 *
 	 * @see Installer_model::$table_authors
 	 * @return void
 	 */
@@ -220,6 +232,7 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela de Imagens
+	 *
 	 * @see Installer_model::$table_images
 	 * @return void
 	 */
@@ -259,7 +272,9 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela de Categorias
+	 *
 	 * 1º Segmento da URL
+	 *
 	 * @see Installer_model::$table_categories
 	 * @return void
 	 */
@@ -295,7 +310,9 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela de Sub Categorias
+	 *
 	 * 2º Segmento da URL
+	 *
 	 * @see Installer_model::$table_subcategories
 	 * @return void
 	 */
@@ -332,7 +349,9 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela de Notícias
+	 *
 	 * 3º Segmento da URL
+	 *
 	 * @see Installer_model::$table_news
 	 * @return void
 	 */
@@ -400,7 +419,9 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * Tabela de Relacionamento entre a Tabela de Sub Categorias com a Tabela de Notícias
+	 *
 	 * Notícia pode ter mais de uma Sub Categoria, mas só uma URL final
+	 *
 	 * @see Installer_model::$table_subcategories_to_news
 	 * @see Installer_model::table_subcategories()
 	 * @see Installer_model::table_news()
@@ -425,6 +446,69 @@ class Installer_model extends CI_Model {
 		$this->dbforge->add_field($fields);
 		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (subcategory_uri) REFERENCES {$this->table_subcategories}(subcategory_uri) ON DELETE CASCADE ON UPDATE CASCADE");
 		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (news_uri) REFERENCES {$this->table_news}(news_uri) ON DELETE CASCADE ON UPDATE CASCADE");
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
+	}
+
+	/**
+	 * Tabela de Previsão do Tempo
+	 *
+	 * Deve ser gerenciada periodicamente sendo chamada pelo cron
+	 *
+	 * Dados coletados em http://forecast.io
+	 *
+	 * @see Installer_model::$table_weather
+	 * @see https://developer.forecast.io/docs/v2
+	 * @return void
+	 */
+	protected function table_weather()
+	{
+		$table = $this->table_weather;
+
+		$fields = array(
+			'weather_timestamp'    => array(
+				'type' => 'TIMESTAMP',
+			),
+			'weather_temp_min'     => array(
+				'type'       => 'INT',
+				'constraint' => 2,
+			),
+			'weather_temp_max'     => array(
+				'type'       => 'INT',
+				'constraint' => 2,
+			),
+			'weather_temp_now'     => array(
+				'type'       => 'INT',
+				'constraint' => 2,
+			),
+			'weather_cloud_cover'  => array(
+				'type'       => 'INT',
+				'constraint' => 3,
+				'unsigned'   => TRUE,
+			),
+			'weather_humidity'     => array(
+				'type'       => 'INT',
+				'constraint' => 3,
+				'unsigned'   => TRUE,
+			),
+			'weather_wind_speed'   => array(
+				'type'       => 'INT',
+				'constraint' => 3,
+				'unsigned'   => TRUE,
+			),
+			'weather_wind_bearing' => array(
+				'type' => "ENUM('N','NE','E','SE','S','SW','W','NW')",
+			),
+			'weather_pressure'     => array(
+				'type'     => 'DECIMAL(6,2)',
+				'unsigned' => TRUE,
+			),
+			'weather_summary'      => array(
+				'type' => "ENUM('clear-day','clear-night','rain','snow','sleet','wind','fog','cloudy','partly-cloudy-day','partly-cloudy-night','hail','thunderstorm',' tornado')",
+			),
+		);
+		$this->dbforge->add_key('weather_timestamp', TRUE);
+		$this->dbforge->add_field($fields);
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
