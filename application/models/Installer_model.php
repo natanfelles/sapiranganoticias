@@ -19,6 +19,12 @@ class Installer_model extends CI_Model {
 	protected $table_users = 'users';
 
 	/**
+	 * @see Installer_model::table_recover_passwords()
+	 * @var string $table_news Nome da Tabela de Recuperação de Senhas
+	 */
+	protected $table_recover_passwords = 'recover_passwords';
+
+	/**
 	 * @see Installer_model::table_authors()
 	 * @var string $table_news Nome da Tabela de Autores
 	 */
@@ -71,6 +77,7 @@ class Installer_model extends CI_Model {
 	public function create_tables()
 	{
 		$this->table_users();
+		$this->table_recover_passwords();
 		$this->table_authors();
 		$this->table_images();
 		$this->table_categories();
@@ -90,27 +97,71 @@ class Installer_model extends CI_Model {
 		$table = $this->table_users;
 
 		$fields = array(
-			'user_id'       => array(
+			'user_id'             => array(
 				'type'           => 'INT',
 				'unsigned'       => TRUE,
 				'auto_increment' => TRUE,
 			),
-			'user_username' => array(
+			'user_username'       => array(
 				'type'       => 'VARCHAR',
 				'constraint' => 255,
 				'unique'     => TRUE,
 			),
-			'user_email'    => array(
+			'user_email'          => array(
 				'type'       => 'VARCHAR',
 				'constraint' => 255,
 				'unique'     => TRUE,
 			),
-			'user_password' => array(
+			'user_email_optional' => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+				'unique'     => TRUE,
+			),
+			'user_password'       => array(
 				'type' => 'TEXT',
+			),
+			'user_lastusernames'  => array(
+				'type'    => 'TEXT',
+				'comment' => 'Últimos username codificados em JSON',
+			),
+			'user_lastpasswords'  => array(
+				'type'    => 'TEXT',
+				'comment' => 'Últimas senhas codificadas em JSON',
 			),
 		);
 		$this->dbforge->add_key('user_id', TRUE);
 		$this->dbforge->add_field($fields);
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
+	}
+
+	/**
+	 * Tabela para Recuperação de Senhas
+	 * @see Installer_model::$recover_passwords
+	 * @return void
+	 */
+	protected function table_recover_passwords()
+	{
+		$table = $this->table_recover_passwords;
+
+		$fields = array(
+			'user_id'                    => array(
+				'type'           => 'INT',
+				'unsigned'       => TRUE,
+				'auto_increment' => TRUE,
+			),
+			'recover_password_code'      => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+				'unique'     => TRUE,
+			),
+			'recover_password_timestamp' => array(
+				'type' => 'TIMESTAMP',
+			),
+		);
+		$this->dbforge->add_key('user_id', TRUE);
+		$this->dbforge->add_field($fields);
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
