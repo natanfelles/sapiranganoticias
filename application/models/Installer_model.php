@@ -13,16 +13,10 @@ class Installer_model extends CI_Model {
 	);
 
 	/**
-	 * @see Installer_model::table_categories()
-	 * @var string $table_categories Nome da Tabela de Categorias
+	 * @see Installer_model::table_users()
+	 * @var string $table_news Nome da Tabela de Usuários
 	 */
-	protected $table_categories = 'categories';
-
-	/**
-	 * @see Installer_model::table_subcategories()
-	 * @var string $table_categories Nome da Tabela de Sub Categorias
-	 */
-	protected $table_subcategories = 'subcategories';
+	protected $table_users = 'users';
 
 	/**
 	 * @see Installer_model::table_authors()
@@ -35,6 +29,18 @@ class Installer_model extends CI_Model {
 	 * @var string $table_news Nome da Tabela de Imagens
 	 */
 	protected $table_images = 'images';
+
+	/**
+	 * @see Installer_model::table_categories()
+	 * @var string $table_categories Nome da Tabela de Categorias
+	 */
+	protected $table_categories = 'categories';
+
+	/**
+	 * @see Installer_model::table_subcategories()
+	 * @var string $table_categories Nome da Tabela de Sub Categorias
+	 */
+	protected $table_subcategories = 'subcategories';
 
 	/**
 	 * @see Installer_model::table_news()
@@ -64,12 +70,49 @@ class Installer_model extends CI_Model {
 	 */
 	public function create_tables()
 	{
+		$this->table_users();
 		$this->table_authors();
 		$this->table_images();
 		$this->table_categories();
 		$this->table_subcategories();
 		$this->table_news();
 		$this->table_subcategories_to_news();
+	}
+
+	/**
+	 * Tabela de Usuários
+	 * Usada para autenticação
+	 * @see Installer_model::$table_user
+	 * @return void
+	 */
+	protected function table_users()
+	{
+		$table = $this->table_users;
+
+		$fields = array(
+			'user_id'       => array(
+				'type'           => 'INT',
+				'unsigned'       => TRUE,
+				'auto_increment' => TRUE,
+			),
+			'user_username' => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+				'unique'     => TRUE,
+			),
+			'user_email'    => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+				'unique'     => TRUE,
+			),
+			'user_password' => array(
+				'type' => 'TEXT',
+			),
+		);
+		$this->dbforge->add_key('user_id', TRUE);
+		$this->dbforge->add_field($fields);
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
 
 	/**
@@ -114,14 +157,12 @@ class Installer_model extends CI_Model {
 			'user_id'                => array(
 				'type'     => 'INT',
 				'unsigned' => TRUE,
-				'comment'  => 'Todo: Relacionar',
 			),
 		);
 		$this->dbforge->add_key('author_id', TRUE);
 		$this->dbforge->add_key('user_id');
 		$this->dbforge->add_field($fields);
-		// Todo: Relacionar
-		//$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
