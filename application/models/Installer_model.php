@@ -148,6 +148,8 @@ class Installer_model extends CI_Model {
 	/**
 	 * Tabela para Recuperação de Senhas
 	 *
+	 * @todo Código deve ser chamado pela uri de recuperação. Deve haver controle de segurança na quantidade de tentativas/códigos inexistentes
+	 *
 	 * @see Installer_model::$recover_passwords
 	 * @return void
 	 */
@@ -156,11 +158,6 @@ class Installer_model extends CI_Model {
 		$table = $this->table_recover_passwords;
 
 		$fields = array(
-			'user_id'                    => array(
-				'type'           => 'INT',
-				'unsigned'       => TRUE,
-				'auto_increment' => TRUE,
-			),
 			'recover_password_code'      => array(
 				'type'       => 'VARCHAR',
 				'constraint' => 255,
@@ -169,8 +166,12 @@ class Installer_model extends CI_Model {
 			'recover_password_timestamp' => array(
 				'type' => 'TIMESTAMP',
 			),
+			'user_id'                    => array(
+				'type'     => 'INT',
+				'unsigned' => TRUE,
+			),
 		);
-		$this->dbforge->add_key('user_id', TRUE);
+		$this->dbforge->add_key('recover_password_code', TRUE);
 		$this->dbforge->add_field($fields);
 		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
 
