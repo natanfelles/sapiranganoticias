@@ -67,6 +67,13 @@ class Installer_model extends CI_Model {
 	protected $table_weather = 'weather';
 
 	/**
+	 * @see Installer_model::table_sessions()
+	 * @var string $table_weather Nome da Tabela de Sessões
+	 */
+	protected $table_sessions = 'sessions';
+
+
+	/**
 	 * Installer_model constructor
 	 */
 	public function __construct()
@@ -92,6 +99,7 @@ class Installer_model extends CI_Model {
 		$this->table_news();
 		$this->table_subcategories_to_news();
 		$this->table_weather();
+		$this->table_sessions();
 	}
 
 	/**
@@ -150,7 +158,7 @@ class Installer_model extends CI_Model {
 	 *
 	 * @todo Código deve ser chamado pela uri de recuperação. Deve haver controle de segurança na quantidade de tentativas/códigos inexistentes
 	 *
-	 * @see Installer_model::$recover_passwords
+	 * @see  Installer_model::$recover_passwords
 	 * @return void
 	 */
 	protected function table_recover_passwords()
@@ -513,5 +521,77 @@ class Installer_model extends CI_Model {
 
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
+
+	/**
+	 * Tabela de Sessões
+	 *
+	 * @see Installer_model::$table_sessions
+	 * @return void
+	 */
+	protected function table_sessions()
+	{
+		$table = $this->table_sessions;
+
+		$fields = array(
+			'session_id'               => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'session_type'             => array(
+				'type' => "ENUM('user','guest')",
+			),
+			'session_ip'               => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'session_country'          => array(
+				'type'       => 'char',
+				'constraint' => 3,
+			),
+			'session_region'           => array(
+				'type'       => 'char',
+				'constraint' => 2,
+			),
+			'session_city'             => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'session_latitude'         => array(
+				'type' => 'DECIMAL(10, 8)',
+			),
+			'session_longitude'        => array(
+				'type' => 'DECIMAL(10, 8)',
+			),
+			'session_datetime'         => array(
+				'type'    => 'DATETIME',
+				'default' => '0000-00-00 00:00:00',
+			),
+			'session_operating_system' => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'session_browser'          => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+				'comment'    => 'User Agent',
+			),
+			'session_current_uri'      => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+				'null'       => TRUE,
+			),
+			'user_id'                  => array(
+				'type'     => 'INT',
+				'unsigned' => TRUE,
+				'null'     => TRUE,
+			),
+		);
+		$this->dbforge->add_key('session_id', TRUE);
+		$this->dbforge->add_field($fields);
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
+	}
+
 
 }
