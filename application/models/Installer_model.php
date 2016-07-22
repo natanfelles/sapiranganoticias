@@ -178,8 +178,6 @@ class Installer_model extends CI_Model {
 	/**
 	 * Tabela para Recuperação de Senhas
 	 *
-	 * @todo Código deve ser chamado pela uri de recuperação. Deve haver controle de segurança na quantidade de tentativas/códigos inexistentes
-	 *
 	 * @see  Installer_model::$recover_passwords
 	 * @return void
 	 */
