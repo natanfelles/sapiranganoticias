@@ -213,7 +213,10 @@ $config['directory_trigger'] = 'd';
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+/**
+ * @todo Definir 1 quando em produção
+ */
+$config['log_threshold'] = 2;
 
 /*
 |--------------------------------------------------------------------------
@@ -250,7 +253,11 @@ $config['log_file_extension'] = '';
 | IMPORTANT: This MUST be an integer (no quotes) and you MUST use octal
 |            integer notation (i.e. 0700, 0644, etc.)
 */
-$config['log_file_permissions'] = 0644;
+// $config['log_file_permissions'] = 0644;
+/**
+ * @todo Voltar às permissões originais quando em produção
+ */
+$config['log_file_permissions'] = 0777;
 
 /*
 |--------------------------------------------------------------------------
@@ -368,7 +375,8 @@ $config['encryption_key'] = '';
 |
 */
 $config['sess_driver'] = 'files';
-$config['sess_cookie_name'] = 'ci_session';
+//$config['sess_cookie_name'] = 'ci_session';
+$config['sess_cookie_name'] = 'session';
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;
@@ -438,9 +446,10 @@ $config['global_xss_filtering'] = FALSE;
 | 'csrf_regenerate' = Regenerate token on every submission
 | 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
 */
-$config['csrf_protection'] = FALSE;
-$config['csrf_token_name'] = 'csrf_test_name';
-$config['csrf_cookie_name'] = 'csrf_cookie_name';
+// $config['csrf_protection'] = FALSE;
+$config['csrf_protection'] = TRUE;
+$config['csrf_token_name'] = 'token';
+$config['csrf_cookie_name'] = 'token';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array();
