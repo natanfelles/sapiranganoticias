@@ -6,6 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * @package      Admin
  * @author       Natan Felles <natanfelles@gmail.com>
+ *
+ * @property Admin_model $admin_model
  */
 class Admin extends CI_Controller {
 
@@ -13,20 +15,66 @@ class Admin extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->library('session');
+		$this->load->helpers(['url']);
+		$this->load->model('admin_model');
 	}
 
+	/**
+	 * Página inicial da administração
+	 *
+	 */
 	public function index()
 	{
-		$this->load->view('templates/head');
+		$data['message'] = array();
+
+		$data['csrf'] = array(
+			'name' => $this->security->get_csrf_token_name(),
+			'hash' => $this->security->get_csrf_hash(),
+		);
+
 		if ($this->session->userdata('auth'))
 		{
-			$this->load->view('admin/dashboard');
+			if ($this->input->post('logout', TRUE))
+			{
+				$this->logout();
+			}
+			$data['title'] = 'Painel Administrativo';
+			$this->load->view('dev/templates/head', $data);
+			$this->load->view('dev/admin/dashboard', $data);
 		}
 		else
 		{
-			$this->load->view('admin/login');
+			if ($this->input->post('login', TRUE))
+			{
+				$data['message'] = $this->login();
+			}
+			$data['title'] = 'Login';
+			$this->load->view('dev/templates/head', $data);
+			$this->load->view('dev/admin/login', $data);
 		}
-		$this->load->view('templates/footer');
+		$this->load->view('dev/templates/footer');
+	}
+
+	protected function login()
+	{
+		$status = $this->admin_model->login($this->input->post());
+
+		if ($status === TRUE)
+		{
+			$this->session->set_userdata('auth', TRUE);
+			header('Location: ' . base_url('admin'));
+		}
+
+		return $message = array(
+			'type'    => 'danger',
+			'content' => 'Não foi possível entrar.',
+		);
+	}
+
+	protected function logout()
+	{
+		$this->session->unset_userdata('auth');
+		header('Location: ' . base_url('admin'));
 	}
 
 }
