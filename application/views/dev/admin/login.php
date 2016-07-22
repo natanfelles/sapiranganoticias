@@ -11,8 +11,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <body>
 <div class="container" style="padding-top: 70px">
-
-
 	<div class="row">
 		<div class="col-md-4 col-center">
 			<div class="panel panel-default">
@@ -34,9 +32,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						</div>
 					</form>
 				</div>
-				<div class="panel-footer">{elapsed_time}</div>
+				<div class="panel-footer">
+					<a href="<?= site_url('admin/recover-password') ?>">Recuperar Senha</a>
+				</div>
 			</div>
-
 			<?php
 			if (isset($message['type'])):
 				?>
@@ -48,8 +47,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				<?php
 			endif;
 			?>
-
 		</div>
 	</div>
 </div>
-
