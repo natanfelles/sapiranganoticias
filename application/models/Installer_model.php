@@ -82,7 +82,7 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * @see Installer_model::table_ads()
-	 * @var string $table_sessions Nome da Tabela de Publicidades
+	 * @var string $table_ads Nome da Tabela de Publicidades
 	 */
 	protected $table_ads = 'ads';
 
@@ -662,7 +662,7 @@ class Installer_model extends CI_Model {
 	 *
 	 * Publicidade pode ter várias subcategorias. Mas apenas um período/horário.
 	 *
-	 * @see Installer_model::$table_ads
+	 * @see Installer_model::$table_subcategories_to_ads
 	 * @see Installer_model::table_subcategories()
 	 * @see Installer_model::table_ads()
 	 * @return void

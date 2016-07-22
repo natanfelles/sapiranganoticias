@@ -11,6 +11,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Installer extends CI_Controller {
 
+	/**
+	 * Installer constructor
+	 *
+	 * @todo Proteger acesso direto a /installer
+	 */
 	public function __construct()
 	{
 		parent::__construct();

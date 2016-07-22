@@ -1,7 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 /**
- * @package      Installer
+ * @package      Admin
  * @author       Natan Felles <natanfelles@gmail.com>
  */
-echo 'Se não houver erros a instalação foi realizada com sucesso.';
+?>
+<body>
+<h1>Dashboard</h1>
