@@ -1,6 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * Class Installer_model
+ *
+ * Model do sistema de Instalação
+ *
+ * @package      Installer
+ * @author       Natan Felles <natanfelles@gmail.com>
+ */
 class Installer_model extends CI_Model {
 
 	/**
@@ -68,9 +76,21 @@ class Installer_model extends CI_Model {
 
 	/**
 	 * @see Installer_model::table_sessions()
-	 * @var string $table_weather Nome da Tabela de Sessões
+	 * @var string $table_sessions Nome da Tabela de Sessões
 	 */
 	protected $table_sessions = 'sessions';
+
+	/**
+	 * @see Installer_model::table_ads()
+	 * @var string $table_sessions Nome da Tabela de Publicidades
+	 */
+	protected $table_ads = 'ads';
+
+	/**
+	 * @see Installer_model::table_subcategories_to_ads()
+	 * @var string $table_subcategories_to_news Nome da Tabela de Relacionamento entre a Tabela de Sub Categorias com a Tabela de Publicidade
+	 */
+	protected $table_subcategories_to_ads = 'subcategories_to_ads';
 
 
 	/**
@@ -100,6 +120,8 @@ class Installer_model extends CI_Model {
 		$this->table_subcategories_to_news();
 		$this->table_weather();
 		$this->table_sessions();
+		$this->table_ads();
+		$this->table_subcategories_to_ads();
 	}
 
 	/**
@@ -545,11 +567,11 @@ class Installer_model extends CI_Model {
 				'constraint' => 255,
 			),
 			'session_country'          => array(
-				'type'       => 'char',
+				'type'       => 'CHAR',
 				'constraint' => 3,
 			),
 			'session_region'           => array(
-				'type'       => 'char',
+				'type'       => 'CHAR',
 				'constraint' => 2,
 			),
 			'session_city'             => array(
@@ -593,5 +615,79 @@ class Installer_model extends CI_Model {
 		$this->dbforge->create_table($table, TRUE, $this->attributes);
 	}
 
+	/**
+	 * Tabela de Publicidade
+	 *
+	 * @see Installer_model::$table_ads
+	 * @return void
+	 */
+	protected function table_ads()
+	{
+		$table = $this->table_ads;
+
+		$fields = array(
+			'ad_id'        => array(
+				'type'           => 'INT',
+				'unsigned'       => TRUE,
+				'auto_increment' => TRUE,
+			),
+			'ad_position'  => array(
+				'type' => "ENUM('header','sidebar_top','sidebar_middle','content_bottom')",
+			),
+			'ad_period'    => array(
+				'type' => "ENUM('dawn','morning','afternoon','night')",
+			),
+			'ad_image_uri' => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'ad_active'    => array(
+				'type'    => "ENUM('y','n')",
+				'default' => 'n',
+			),
+			'user_id'      => array(
+				'type'     => 'INT',
+				'unsigned' => TRUE,
+			),
+		);
+		$this->dbforge->add_key('ad_id', TRUE);
+		$this->dbforge->add_field($fields);
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (user_id) REFERENCES {$this->table_users}(user_id) ON DELETE CASCADE ON UPDATE CASCADE");
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
+	}
+
+	/**
+	 * Tabela de Relacionamento entre a Tabela de Sub Categorias com a Tabela de Publicidade
+	 *
+	 * Publicidade pode ter várias subcategorias. Mas apenas um período/horário.
+	 *
+	 * @see Installer_model::$table_ads
+	 * @see Installer_model::table_subcategories()
+	 * @see Installer_model::table_ads()
+	 * @return void
+	 */
+	protected function table_subcategories_to_ads()
+	{
+		$table = $this->table_subcategories_to_ads;
+
+		$fields = array(
+			'subcategory_uri' => array(
+				'type'       => 'VARCHAR',
+				'constraint' => 255,
+			),
+			'ad_id'           => array(
+				'type'     => 'INT',
+				'unsigned' => TRUE,
+			),
+		);
+		$this->dbforge->add_key('subcategory_uri', TRUE);
+		$this->dbforge->add_key('ad_id');
+		$this->dbforge->add_field($fields);
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (subcategory_uri) REFERENCES {$this->table_subcategories}(subcategory_uri) ON DELETE CASCADE ON UPDATE CASCADE");
+		$this->dbforge->add_field("CONSTRAINT FOREIGN KEY (ad_id) REFERENCES {$this->table_ads}(ad_id) ON DELETE CASCADE ON UPDATE CASCADE");
+
+		$this->dbforge->create_table($table, TRUE, $this->attributes);
+	}
 
 }
