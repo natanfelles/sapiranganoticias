@@ -25,7 +25,7 @@ class Installer extends CI_Controller {
 	public function index()
 	{
 		$this->installer_model->create_tables();
-		$this->load->view('installer/index');
+		$this->load->view('dev/installer/index');
 	}
 
 }
