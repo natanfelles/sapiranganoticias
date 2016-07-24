@@ -19,6 +19,7 @@ class Admin_model extends CI_Model {
 	{
 		parent::__construct();
 		$this->load->database();
+		$this->load->library('encryption');
 	}
 
 	/**
@@ -30,20 +31,19 @@ class Admin_model extends CI_Model {
 	 */
 	public function login($user = array())
 	{
-		/**
-		 * @todo Selecionar username e password quando houver o username. A senha será descriptografada mais abaixo.
-		 */
-		$data = $this->db->select('user_id')
+		$data = $this->db->select('user_username, user_password')
 		                 ->where('user_username', $user['username'])
-		                 ->where('user_password', $user['password'])
 		                 ->get('users')
 		                 ->row_array();
-		/**
-		 * @todo Otimizar autenticação! Descriptografar a senha e ver se ela é identica a do $user['password'].
-		 */
-		if (isset($data['user_id']))
+
+		if (isset($data['user_username']))
 		{
-			return TRUE;
+			$hash = $this->encryption->decrypt($data['user_password']);
+
+			if (password_verify($user['password'], $hash))
+			{
+				return TRUE;
+			}
 		}
 
 		return FALSE;
@@ -52,22 +52,24 @@ class Admin_model extends CI_Model {
 	/**
 	 * Retorna o Código de Recuperação de Senha se o usuário for válido
 	 *
+	 * @see Admin::try_recover_password()
+	 *
 	 * @param array $user username|email
 	 *
 	 * @return bool|string
 	 */
 	public function set_recover_password($user = array())
 	{
-		$user = $this->db->select('user_id')
+		$data = $this->db->select('user_id')
 		                 ->where('user_username', $user['username'])
 		                 ->where('user_email', $user['email'])
 		                 ->get('users')
 		                 ->row_array();
 
-		if (isset($user['user_id']))
+		if (isset($data['user_id']))
 		{
 			$verify = $this->db->select('user_id')
-			                   ->where('user_id', $user['user_id'])
+			                   ->where('user_id', $data['user_id'])
 			                   ->get('recover_passwords')
 			                   ->row_array();
 
@@ -93,7 +95,9 @@ class Admin_model extends CI_Model {
 	/**
 	 * Autentifica se o Código de Recuperação de Senha é válido
 	 *
-	 * @param string $code
+	 * @see Admin::new_password()
+	 *
+	 * @param string $code Código de Recuperação de Senha
 	 *
 	 * @return bool
 	 */
@@ -116,6 +120,14 @@ class Admin_model extends CI_Model {
 		}
 
 		return FALSE;
+	}
+
+	public function set_new_password($data = array())
+	{
+		$password = password_hash($data['user_password'], PASSWORD_DEFAULT);
+		$data['user_password'] = $this->encryption->encrypt($password);
+
+		return $this->db->replace('users', $data);
 	}
 
 }

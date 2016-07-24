@@ -82,7 +82,7 @@ class Admin extends CI_Controller {
 	}
 
 	/**
-	 * Remove a utenticação do usuário
+	 * Remove a autenticação do usuário
 	 *
 	 * @see Admin::index()
 	 */
@@ -159,11 +159,11 @@ class Admin extends CI_Controller {
 
 				$this->email->initialize($config);
 
-				$this->email->from('sapiranganoticias@gmail.com', 'Natan Felles');
+				$this->email->from('sapiranganoticias@gmail.com', 'Sapiranga Notícias');
 				$this->email->to($user['email']);
 				$this->email->subject('Recuperação de Senha');
-				$this->email->message("<h1>Olá, {$user['username']}!</h1> <p>Recebemos uma solicitação para recuperar a sua senha.</p> <p>Se não foi você, favor desconsiderar essa mensagem.</p><p>Se quiser modificar sua senha, clique no link <a 
-href='http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}'>http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}</a> para recuperar sua senha.</p>");
+				$this->email->message("<h1>Olá, {$user['username']}!</h1> <p>Recebemos uma solicitação para recuperar a sua senha.</p> <p>Se não foi você, favor desconsiderar essa mensagem.</p><p>Se quiser modificar sua senha, clique <a 
+href='http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}'>nesse link</a> ou copie e cole o endereço abaixo em seu navegador: </p><p>http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}</p>");
 
 				$this->email->send();
 			}
@@ -217,6 +217,20 @@ href='http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}'>h
 				'type'    => 'info',
 				'content' => 'Guarde sua senha em um local seguro depois de modificá-la.',
 			);
+
+			/**
+			 * @todo Fazer validação - senhas iguais repeat
+			 */
+			if ($this->input->post('recover'))
+			{
+				$user = array(
+					'user_username' => $this->input->post('username'),
+					'user_password' => $this->input->post('password'),
+				);
+				$this->admin_model->set_new_password($user);
+				header('Location: ' . site_url('admin'));
+			}
+
 			$this->load->view('dev/admin/new-password', $data);
 		}
 		else
