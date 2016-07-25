@@ -72,6 +72,8 @@ class Admin extends CI_Controller {
 		if ($status === TRUE)
 		{
 			$this->session->set_userdata('auth', TRUE);
+			$user = $this->admin_model->get_profile($this->input->post('username'));
+			$this->session->set_userdata($user);
 			header('Location: ' . base_url('admin'));
 		}
 
@@ -241,6 +243,42 @@ href='http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}'>n
 			);
 			$this->load->view('dev/admin/new-password', $data);
 		}
+		$this->load->view('dev/templates/footer', $data);
+	}
+
+	public function profile()
+	{
+		if ( ! $this->session->userdata('auth'))
+		{
+			header('Location: ' . site_url('admin'));
+		}
+
+		$data['csrf'] = array(
+			'name' => $this->security->get_csrf_token_name(),
+			'hash' => $this->security->get_csrf_hash(),
+		);
+
+		$data['user'] = $this->session->get_userdata();
+
+		if ($this->input->post('profile'))
+		{
+			$profile = $this->input->post();
+			$profile['user_id'] = $data['user']['user_id'];
+			$this->admin_model->update_profile($profile);
+			$user = $this->admin_model->get_profile($this->input->post('username'));
+			$this->session->set_userdata($user);
+
+			$data['user'] = $this->session->get_userdata();
+
+			$data['message'] = array(
+				'type'    => 'success',
+				'content' => 'Perfil atualizado com sucesso.',
+			);
+		}
+
+		$data['title'] = 'Perfil';
+		$this->load->view('dev/templates/head', $data);
+		$this->load->view('dev/admin/profile', $data);
 		$this->load->view('dev/templates/footer', $data);
 	}
 

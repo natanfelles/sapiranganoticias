@@ -132,4 +132,23 @@ class Admin_model extends CI_Model {
 		                ->update('users');
 	}
 
+	public function get_profile($username = '')
+	{
+		return $this->db->where('user_username', $username)
+		                ->get('users')
+		                ->row_array();
+	}
+
+	public function update_profile($data = array())
+	{
+		$password = password_hash($data['password'], PASSWORD_DEFAULT);
+		$data['password'] = $this->encryption->encrypt($password);
+
+		return $this->db->set('user_username', $data['username'])
+		                ->set('user_email', $data['email'])
+		                ->set('user_password', $data['password'])
+		                ->where('user_id', $data['user_id'])
+		                ->update('users');
+	}
+
 }
