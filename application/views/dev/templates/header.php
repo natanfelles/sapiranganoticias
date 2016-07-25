@@ -74,7 +74,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						</li>
 						<li role="separator" class="divider"></li>
 						<li>
-							<a href="#">Other</a>
+							<!-- @todo Trocar para formulário com csrf -->
+							<a href="<?= site_url('admin/lock') ?>">Bloquear Tela</a>
 						</li>
 					</ul>
 				</li>

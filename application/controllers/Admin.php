@@ -30,33 +30,41 @@ class Admin extends CI_Controller {
 	 */
 	public function index()
 	{
-		$data['csrf'] = array(
-			'name' => $this->security->get_csrf_token_name(),
-			'hash' => $this->security->get_csrf_hash(),
-		);
-
-		if ($this->session->userdata('auth'))
+		if ($this->session->userdata('lock'))
 		{
-			if ($this->input->post('logout', TRUE))
-			{
-				$this->logout();
-			}
-			$data['user'] = $this->session->get_userdata();
-			$data['title'] = 'Painel Administrativo';
-			$this->load->view('dev/templates/head', $data);
-			$this->load->view('dev/admin/dashboard', $data);
+			$this->lock();
 		}
 		else
 		{
-			if ($this->input->post('login', TRUE))
+
+			$data['csrf'] = array(
+				'name' => $this->security->get_csrf_token_name(),
+				'hash' => $this->security->get_csrf_hash(),
+			);
+
+			if ($this->session->userdata('auth'))
 			{
-				$data['message'] = $this->login();
+				if ($this->input->post('logout', TRUE))
+				{
+					$this->logout();
+				}
+				$data['user'] = $this->session->get_userdata();
+				$data['title'] = 'Painel Administrativo';
+				$this->load->view('dev/templates/head', $data);
+				$this->load->view('dev/admin/dashboard', $data);
 			}
-			$data['title'] = 'Login';
-			$this->load->view('dev/templates/head', $data);
-			$this->load->view('dev/admin/login', $data);
+			else
+			{
+				if ($this->input->post('login', TRUE))
+				{
+					$data['message'] = $this->login();
+				}
+				$data['title'] = 'Login';
+				$this->load->view('dev/templates/head', $data);
+				$this->load->view('dev/admin/login', $data);
+			}
+			$this->load->view('dev/templates/footer');
 		}
-		$this->load->view('dev/templates/footer');
 	}
 
 	/**
@@ -249,9 +257,63 @@ href='http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}'>n
 
 	public function profile()
 	{
-		if ( ! $this->session->userdata('auth'))
+		if ($this->session->userdata('lock'))
 		{
-			header('Location: ' . site_url('admin'));
+			$this->lock();
+		}
+		else
+		{
+			if ( ! $this->session->userdata('auth'))
+			{
+				header('Location: ' . site_url('admin'));
+			}
+
+			$data['csrf'] = array(
+				'name' => $this->security->get_csrf_token_name(),
+				'hash' => $this->security->get_csrf_hash(),
+			);
+
+			$data['user'] = $this->session->get_userdata();
+
+			if ($this->input->post('profile'))
+			{
+				$profile = $this->input->post();
+				$profile['user_id'] = $data['user']['user_id'];
+				$this->admin_model->update_profile($profile);
+				$user = $this->admin_model->get_profile($this->input->post('username'));
+				$this->session->set_userdata($user);
+
+				$data['user'] = $this->session->get_userdata();
+
+				$data['message'] = array(
+					'type'    => 'success',
+					'content' => 'Perfil atualizado com sucesso.',
+				);
+			}
+
+			$data['title'] = 'Perfil';
+			$this->load->view('dev/templates/head', $data);
+			$this->load->view('dev/admin/profile', $data);
+			$this->load->view('dev/templates/footer', $data);
+		}
+	}
+
+	public function lock()
+	{
+		if ($this->input->post('unlock'))
+		{
+			$user['username'] = $this->session->userdata('user_username');
+			$user['password'] = $this->input->post('password');
+			// Faz a verficação e desbloqueia a tela
+			if ($this->admin_model->login($user))
+			{
+				$this->session->unset_userdata('lock');
+				header('Location: ' . site_url('admin'));
+			}
+		}
+		else
+		{
+			$this->session->set_userdata('lock', TRUE);
 		}
 
 		$data['csrf'] = array(
@@ -261,26 +323,11 @@ href='http://sapiranganoticias.tk/admin/new-password/{$recover_password_code}'>n
 
 		$data['user'] = $this->session->get_userdata();
 
-		if ($this->input->post('profile'))
-		{
-			$profile = $this->input->post();
-			$profile['user_id'] = $data['user']['user_id'];
-			$this->admin_model->update_profile($profile);
-			$user = $this->admin_model->get_profile($this->input->post('username'));
-			$this->session->set_userdata($user);
-
-			$data['user'] = $this->session->get_userdata();
-
-			$data['message'] = array(
-				'type'    => 'success',
-				'content' => 'Perfil atualizado com sucesso.',
-			);
-		}
-
-		$data['title'] = 'Perfil';
+		$data['title'] = 'Tela Bloqueada';
 		$this->load->view('dev/templates/head', $data);
-		$this->load->view('dev/admin/profile', $data);
+		$this->load->view('dev/admin/lock', $data);
 		$this->load->view('dev/templates/footer', $data);
 	}
+
 
 }
