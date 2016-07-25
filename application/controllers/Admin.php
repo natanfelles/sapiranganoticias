@@ -41,6 +41,7 @@ class Admin extends CI_Controller {
 			{
 				$this->logout();
 			}
+			$data['user'] = $this->session->get_userdata();
 			$data['title'] = 'Painel Administrativo';
 			$this->load->view('dev/templates/head', $data);
 			$this->load->view('dev/admin/dashboard', $data);

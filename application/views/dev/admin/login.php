@@ -3,13 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * @package      Admin
  * @author       Natan Felles <natanfelles@gmail.com>
- */
-/**
+ *
  * @var array $message Mensagem
  * @var array $csrf    Proteção contra CSRF
  */
 ?>
-<body>
 <div class="container" style="padding-top: 70px">
 	<div class="row">
 		<div class="col-md-4 col-center">

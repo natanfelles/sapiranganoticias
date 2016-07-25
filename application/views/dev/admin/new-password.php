@@ -3,18 +3,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * @package      Admin
  * @author       Natan Felles <natanfelles@gmail.com>
- */
-/**
+ *
  * @var array $message Mensagem
  * @var array $csrf    Proteção contra CSRF
  */
 ?>
-<body>
 <div class="container" style="padding-top: 70px">
 	<div class="row">
 		<div class="col-md-4 col-center">
 			<?php
-			if ( $message['type'] != 'danger'):
+			if ($message['type'] != 'danger'):
 				?>
 				<div class="panel panel-default">
 					<div class="panel-heading">Recuperação de Senha</div>

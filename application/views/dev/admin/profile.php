@@ -1,12 +1,14 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 /**
+ * @package      Admin
+ * @author       Natan Felles <natanfelles@gmail.com>
+ *
  * @var array $csrf
  * @var array $user Dados do Usuário
  */
-//echo '<pre>';
-//print_r($user);
+$this->load->view('dev/templates/header');
 ?>
-<body>
 <div class="container">
 	<h1>Perfil</h1>
 	<?php
