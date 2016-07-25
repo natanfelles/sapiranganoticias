@@ -127,7 +127,9 @@ class Admin_model extends CI_Model {
 		$password = password_hash($data['user_password'], PASSWORD_DEFAULT);
 		$data['user_password'] = $this->encryption->encrypt($password);
 
-		return $this->db->replace('users', $data);
+		return $this->db->set('user_password', $data['user_password'])
+		                ->where('user_username', $data['user_username'])
+		                ->update('users');
 	}
 
 }
